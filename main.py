@@ -1,36 +1,30 @@
-import requests
 import time
+import requests
 
-TOKEN = "8226089903:AAHZlQpz4AjSDMxAyvqHRUEpPKzf1Xk6wEU"
+TOKEN = "7264023511:AAEsFuu-vywsbcELL5yblRiiBYIfB8cYVls"
 CHAT_ID = "7622002758"
+API = f"https://api.telegram.org/bot{TOKEN}"
+
+def send_message(text):
+    try:
+        requests.post(f"{API}/sendMessage", json={"chat_id": CHAT_ID, "text": text}, timeout=10)
+    except Exception as e:
+        print("Erreur:", e)
 
 def get_btc_price():
     try:
-        response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
-        data = response.json()
-        return float(data["price"])
-    except Exception as e:
+        r = requests.get("https://fapi.binance.com/fapi/v1/ticker/price", params={"symbol": "BTCUSDT"}, timeout=10)
+        return float(r.json()["price"])
+    except:
         return None
 
-def send_message(message):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {"chat_id": CHAT_ID, "text": message}
-    try:
-        requests.post(url, data=payload)
-    except Exception as e:
-        print("Erreur envoi message:", e)
-
 def main():
-    last_price = 0
-    send_message("🚀 Bot de surveillance BTC lancé avec succès.")
-    
+    send_message("🚀 Bot Trading Athmane connecté et opérationnel !")
     while True:
-        price = get_btc_price()
-        if price:
-            if abs(price - last_price) > 100:  # alerte variation
-                send_message(f"📊 BTC: {price:.2f} USD")
-                last_price = price
-        time.sleep(60)  # vérifie toutes les minutes
+        btc = get_btc_price()
+        if btc:
+            send_message(f"₿ BTC/USDT = {btc:,.2f} $")
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()
